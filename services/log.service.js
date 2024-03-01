@@ -6,15 +6,19 @@ export class Log {
     }
 
     static success(msg) {
-        console.log(chalk.bgGreen(' SUCCESS ') + ' ' + msg)
+        console.log(`${chalk.bgGreen(' SUCCESS ')} \n${msg}`)
     }
 
     static help() {
         console.log(
             `
-            ${chalk.bgCyan('HELP')}
-            Для того чтобы пользоваться
-            
+${chalk.bgCyan('HELP')}
+Для того чтобы пользоваться этой утилитой необходимо получить api ключ
+на сайте openweathermap.org
+    Команды:
+-h помошь
+-t [TOKEN] Установка api токена для получения данных о погоде
+-s
             `
             )
     }
