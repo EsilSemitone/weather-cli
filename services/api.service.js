@@ -59,8 +59,8 @@ export class ApiConnect {
             return data;
         }
         catch(e) {
-            if (e?.response?.status == 400) {
-                throw new Error('Неверно указан город')
+            if (e?.response?.status == 404) {
+                throw new Error('Неверно указан город или токен, удостоверьтесь в что введи данные верно')
             }
             else if (e?.response?.status == 401) {
                 throw new Error('Неверно указан токен')
