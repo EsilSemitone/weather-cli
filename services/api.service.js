@@ -1,77 +1,49 @@
 import axios from 'axios';
+
 import { Storage } from './storage.service.js';
+import { translate } from './translate.service.js';
 
 export class ApiConnect {
     
     static token = '';
     static city = '';
 
-    /**
-     * @param {string} token
-     */
-    static set apiToken(token) {
-        this.token = token;
-    }
-
-    static get apiToken() {
-        if (this.token == '' || this.token == undefined) {
-            throw new Error('Не установлен Token, установить -t {Token}')
-        }
-        return this.token;
-    }
-
-    /**
-     * @param {string} city
-     */
-    static set apiCity(city) {
-        this.city = city;
-    }
-
-    static get apiCity() {
-        if (this.city == '' || this.city == undefined) {
-            throw new Error('Не установлен Город, установить -s {City}')
-        }
-        return this.city;
-    }
-
     static async updateArgs() {
         try {
-            this.apiToken = await Storage.getValue('token');
-            this.apiCity = await Storage.getValue('city');
+            this.token = await Storage.getValue('token');
+            this.city = await Storage.getValue('city');
         }
-        catch(e) {
-            throw new Error(`Один из параметров не установлен или файл конфигураций \n поврежден, если ошибка не уходит необходимо сбросить файл конфигураций -reset`)
+        catch {
+            throw new Error(await translate.getPhrase("other", "not_set_some_arg"))
         }
     }
 
-    static async getWeatherToday() {
+    static async * getWeatherToday() {
         await this.updateArgs();
-        try {
-            const {data} = await axios.get('https://api.openweathermap.org/data/2.5/weather', {
-                params: {
-                   q: this.apiCity,
-                   appid: this.apiToken,
-                   units: 'metric',
-                   lang: 'ru'
+        const lang = await Storage.getValue('lang');
+        for (let city of this.city) {
+            try {
+                const {data} = await axios.get('https://api.openweathermap.org/data/2.5/weather', {
+                    params: {
+                       q: city,
+                       appid: this.token,
+                       units: 'metric',
+                       lang: lang || 'en'
+                    }
+                });
+                yield data;
+            }
+            catch(e) {
+                if (e?.response?.status == 404) {
+                    throw new Error(await translate.getPhrase("token", "invalid_some_arg"))
                 }
-            });
-    
-            return data;
-        }
-        catch(e) {
-            if (e?.response?.status == 404) {
-                throw new Error('Неверно указан город или токен, удостоверьтесь в что введи данные верно')
-            }
-            else if (e?.response?.status == 401) {
-                throw new Error('Неверно указан токен')
-            }
-            else {
-                throw new Error(e.message)
+                else if (e?.response?.status == 401) {
+                    throw new Error(await translate.getPhrase("token", "invalid_token"))
+                }
+                else {
+                    throw new Error(e.message)
+                }
             }
         }
-    }
-
-    static getWeatherFourDays() {
-        return;
     }
 }

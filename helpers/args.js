@@ -1,9 +1,10 @@
 export function getArgs(args) {
     const res = {};
+    const COMMANDS = ['-s', '-h', '-t', '-reset', '-lang'];
 
-    args.slice(1).forEach((el, index, array) => {
-        if (['-s', '-h', '-t', '-reset'].includes(el)) {
-            if (index == array.length - 1 || ['-s', '-h', '-t'].includes(array[index + 1])) {
+    args.slice(2).forEach((el, index, array) => {
+        if (COMMANDS.includes(el)) {
+            if (index == array.length - 1 || COMMANDS.includes(array[index + 1])) {
                 res[el[1]] = true;
             }
             else {

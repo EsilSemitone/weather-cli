@@ -1,24 +1,20 @@
 import chalk from 'chalk'
+import dedent from 'dedent-js'
+
+import { translate } from './translate.service.js';
 
 export class Log {
-    static error(error) {
+    static async error(error) {
         console.log(chalk.bgRed(' ERROR ') + ' ' + error)
     }
 
-    static success(msg) {
-        console.log(`${chalk.bgGreen(' SUCCESS ')} \n${msg}`)
+    static async success(msg) {
+        console.log(`${chalk.bgGreen(' SUCCESS ')}\n${msg}`)
     }
 
-    static help() {
-        console.log(
-            `
-${chalk.bgCyan('HELP')}
-Для того чтобы пользоваться этой утилитой необходимо получить api ключ
-на сайте openweathermap.org
-    Команды:
--h помошь
--t [TOKEN] Установка api токена для получения данных о погоде
--s
+    static async help() {
+        console.log(dedent`${chalk.bgCyan('HELP')}
+            ${await translate.getPhrase("main", "help")}
             `
             )
     }
